@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User Management</title>
+</head>
+<body>
+  <h2>User Management App</h2>
+
+  <form id="userForm">
+    <input type="text" id="name" placeholder="Name" required>
+    <input type="email" id="email" placeholder="Email" required>
+    <button type="submit">Add User</button>
+  </form>
+
+  <h3>Users:</h3>
+  <ul id="userList"></ul>
+
+  <script>
+    const userList = document.getElementById('userList');
+    const userForm = document.getElementById('userForm');
+
+    function loadUsers() {
+      fetch('/api/users')
+        .then(res => res.json())
+        .then(users => {
+          userList.innerHTML = '';
+          users.forEach(user => {
+            const li = document.createElement('li');
+            li.textContent = `${user.name} (${user.email})`;
+            userList.appendChild(li);
+          });
+        });
+    }
+
+    userForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+
+      fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email })
+      })
+      .then(res => res.json())
+      .then(() => {
+        loadUsers();
+        userForm.reset();
+      });
+    });
+
+    loadUsers();
+  </script>
+</body>
+</html>
